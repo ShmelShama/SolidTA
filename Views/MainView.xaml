@@ -1,0 +1,81 @@
+﻿<Window x:Class="SolidTA.Views.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SolidTA.Views"
+        xmlns:viewModels="clr-namespace:SolidTA.ViewModels"
+        mc:Ignorable="d"
+        Title="SolidTA"
+         Height="250" Width="250"
+        d:DataContext="{d:DesignInstance viewModels:MainViewModel, d:IsDesignTimeCreatable=true}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Column="0"
+              Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <DatePicker Grid.Row="0"
+                    Grid.Column="0"
+                    SelectedDate="{Binding SelectedDate}"
+            Margin="10"
+            HorizontalAlignment="Center" 
+            VerticalAlignment="Top"/>
+            <Button Content="Начать"
+               Grid.Column="1"
+               Grid.Row="0"
+                Margin="10"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Top"
+               Command="{Binding StartCommand}"
+                    IsEnabled="{Binding IsStartButtonEnabled}"
+               />
+        </Grid>
+        <StackPanel Grid.Column="0"
+                   Grid.Row="1"
+                    Orientation="Vertical">
+            <TextBlock Text="Статус: "
+                       HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                     Margin="10,10,10,5">
+            </TextBlock>
+            <TextBlock Text="{Binding ProcessInfo}"
+                       TextWrapping="Wrap"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Margin="10,0,10,0">
+
+            </TextBlock>
+        </StackPanel>
+
+        <StackPanel Grid.Column="0"
+                   Grid.Row="2"
+                    Orientation="Vertical">
+            <TextBlock Text="Отчет Excel: "
+                       HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                    Margin="10,10,10,5">
+            </TextBlock>
+            <TextBox Text="{Binding ExcelPath}"
+                       TextWrapping="Wrap"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Margin="10,0,10,0"
+                        IsReadOnly="True"
+                       Background="Transparent"
+                    >
+
+            </TextBox>
+        </StackPanel>
+
+    </Grid>
+</Window>
