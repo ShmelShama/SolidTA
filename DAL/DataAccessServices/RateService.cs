@@ -13,11 +13,13 @@ namespace SolidTA.DAL.DataAccessServices
     {
         private RateService() { }
 
-        public static async void AddRates(List<Rate> rates)
+        public static async Task<bool> AddRates(List<Rate> rates)
         {
+            
             using (DbSolidContext dbContext = new DbSolidContext())
             {
-                
+                if (!dbContext.Database.Exists())
+                    return false;
                 foreach (var rate in rates)
                 {
                     Currency dbCurrency =await dbContext.Currency.FirstOrDefaultAsync(c => c.CharCode.Equals(rate.Currency.CharCode));
@@ -44,7 +46,7 @@ namespace SolidTA.DAL.DataAccessServices
 
                 }
                 await dbContext.SaveChangesAsync();
-
+                return true;
             }
 
         }

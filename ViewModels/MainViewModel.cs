@@ -1,19 +1,13 @@
 ﻿using SolidTA.Commons;
 using SolidTA.Core;
-using SolidTA.DAL;
 using SolidTA.XmlUtils.XmlSerializers;
 using SolidTA.XmlUtils.XmlModels;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using SolidTA.DAL.MapProfiles;
 using SolidTA.DAL.Entities;
-using System.Windows;
 using SolidTA.DAL.DataAccessServices;
 using SolidTA.Interfaces;
 using SolidTA.ExcelUtils.ExcelModels;
@@ -83,7 +77,18 @@ namespace SolidTA.ViewModels
             IsStartButtonEnabled = false ;
             ExcelPath = string.Empty;
             ProcessInfo = "Загрузка данных с сайта ЦБ...";
-            ValCurs valCurs = await GetValCurs();
+            ValCurs valCurs = null;
+            try
+            {
+                valCurs = await GetValCurs();
+            }
+            catch
+            {
+                IsStartButtonEnabled = true;
+                ProcessInfo = "Не удалось получить данные с сайта ЦБ.\nПроверьте подключение к интернету";
+                return;
+
+            }
 
             ProcessInfo = "Загрузка данных в БД...";
             List<Rate> rateList = new List<Rate>();
@@ -94,7 +99,7 @@ namespace SolidTA.ViewModels
                 IsStartButtonEnabled = true;
                 return;
             }
-            RateService.AddRates(rateList);
+            bool dbCheck =await RateService.AddRates(rateList);
 
             ProcessInfo = "Формирование отчета в Excel...";
             List<IExcelModel> excelModels = new List<IExcelModel>();
@@ -118,16 +123,31 @@ namespace SolidTA.ViewModels
             CrosCursExporter crosCursExporter = new CrosCursExporter();
             crosCursExporter.SetExportData(excelModels);
             DateTime dateTime  = DateTime.Parse(valCurs.Date);
-            string excelPathTemp = $"{Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)}\\{dateTime:yyyy.MM.dd}.xlsx";
+            string excelPathTemp = $"{System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location)}\\{dateTime:yyyy.MM.dd}.xlsx";
             var exportResult = crosCursExporter.Export(excelPathTemp);
             if(!exportResult)
             {
-                ProcessInfo = "Не удалось сформировать отчет Excel!";
+                if (!dbCheck)
+                {
+                    ProcessInfo = "Не удалость подключиться к БД.\nНе удалось сформировать отчет Excel!";
+                 }
+                else
+                {
+                    ProcessInfo = "Не удалось сформировать отчет Excel!";
+                }
             }
             else
             {
+                if (!dbCheck)
+                {
+                    ProcessInfo = "Не удалость подключиться к БД.\nОтчет в Excel cформирован";
+                }
+                else
+                {
+                    ProcessInfo = "Готово";
+                }
                 ExcelPath = excelPathTemp;
-                ProcessInfo = "Готово";
+
             }
             
             IsStartButtonEnabled = true;
